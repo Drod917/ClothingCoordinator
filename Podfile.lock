@@ -1,0 +1,28 @@
+PODS:
+  - IQKeyboardManagerSwift (6.5.1)
+  - Navajo-Swift (2.1.0)
+  - OAuthSwift (2.2.0)
+  - SwiftDrawer (5.0.2)
+
+DEPENDENCIES:
+  - IQKeyboardManagerSwift
+  - Navajo-Swift
+  - OAuthSwift (~> 2.2.0)
+  - SwiftDrawer
+
+SPEC REPOS:
+  trunk:
+    - IQKeyboardManagerSwift
+    - Navajo-Swift
+    - OAuthSwift
+    - SwiftDrawer
+
+SPEC CHECKSUMS:
+  IQKeyboardManagerSwift: 9ac7524fad9f9fe9a3b98c927e7772471ca546d2
+  Navajo-Swift: 57b93e73efbfbf452433efbff04402de56beff51
+  OAuthSwift: 75efbb5bd9a4b2b71a37bd7e986bf3f55ddd54c6
+  SwiftDrawer: 2ed1b1e13fa46323bb04b6cc417c05edf51b1b4a
+
+PODFILE CHECKSUM: a6dab9f8dfa94d7f0e7f050d8dee0ac424cf191e
+
+COCOAPODS: 1.9.3

@@ -27,8 +27,13 @@ struct User: Codable, Identifiable {
 
 struct Party: Codable, Identifiable {
     let id = UUID()
-    let partyName: String
-    let hostId: String
+    let name: String
+    let host_id: Int
     let description: String
     let date: String
+}
+
+struct Token: Codable, Identifiable {
+    let id = UUID()
+    let token: String
 }

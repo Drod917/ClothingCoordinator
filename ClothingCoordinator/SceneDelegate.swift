@@ -12,6 +12,7 @@ import SwiftDrawer
 class UserSettings: ObservableObject {
     
     @Published var loggedIn : Bool = false
+    @Published var token : String = ""
 }
 
 class UserOnboard: ObservableObject {
@@ -129,7 +130,7 @@ struct StartView: View {
 //            return AnyView(TabbarVC())
             return AnyView(Drawer()
                             .setSlider(view: SliderView(type: .leftRear))
-                            .setMain(view: GuestView()))
+                            .setMain(view: GuestView()).environmentObject(settings))
         } else {
             return AnyView(LoginView())
         }
@@ -153,7 +154,7 @@ struct StartOnboardView: View {
 //                return AnyView(TabbarVC())
                 return AnyView(Drawer()
                                 .setSlider(view: SliderView(type: .leftRear))
-                                .setMain(view: GuestView()))
+                                .setMain(view: GuestView()).environmentObject(settings))
             } else {
                 settings.loggedIn = false
                 return AnyView(OnboardingView())

@@ -9,9 +9,11 @@ import SwiftUI
 import SwiftDrawer
 
 struct GuestView: View {
+    @EnvironmentObject var settings: UserSettings
     @Environment(\.colorScheme) var colorScheme
     @State var parties: [Party] = []
     @State private var showEditing = false
+    @State var token: String = ""
         
     var body: some View {
         
@@ -21,10 +23,10 @@ struct GuestView: View {
                     Button(action: {
                         showEditing = true
                     }) {
-                        PartyCardView(partyName: "\(party.partyName)", hostName: party.hostId, description: "\(party.description)", date: party.date)
+                        PartyCardView(partyName: "\(party.name)", hostName: String(party.host_id), description: "\(party.description)", date: party.date)
                     }
                     .sheet(isPresented: $showEditing) {
-                        PartyFullView(partyName: "\(party.partyName)", hostName: party.hostId, description: "\(party.description).", date: party.date)
+                        PartyFullView(partyName: "\(party.name)", hostName: String(party.host_id), description: "\(party.description).", date: party.date)
                     }
                     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 }
@@ -35,9 +37,13 @@ struct GuestView: View {
             }
             .navigationBarTitle("Guest List")
             .onAppear {
-                apiCall().getParties { (parties) in
-                    self.parties = parties
-                }
+                token = UserDefaults.standard.string(forKey: "token") ?? "No token found"
+                //token = settings.token
+                
+                apiCall().getParties(completion:  {     (parties) in
+                        self.parties = parties
+                    },
+                token: token)
             }
         }
     }

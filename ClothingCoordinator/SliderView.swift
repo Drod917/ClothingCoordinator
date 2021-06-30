@@ -8,6 +8,8 @@
 
 import SwiftUI
 import SwiftDrawer
+import Combine
+
 struct SliderView : View, SliderProtocol {
     @EnvironmentObject var settings: UserSettings
     @EnvironmentObject public var drawerControl: DrawerControl
@@ -44,6 +46,10 @@ struct SliderView : View, SliderProtocol {
                         UserDefaults.standard.set(false, forKey: "Loggedin")
                         UserDefaults.standard.synchronize()
                         self.settings.loggedIn = false
+                    
+                        self.drawerControl.show(type: .leftRear, isShow: false)
+                        self.drawerControl.setMain(view: LoginView())
+                        
                         // ==========
                         
                         // For use with property wrapper

@@ -14,12 +14,21 @@ final class DataStore: ObservableObject {
     let didChange = PassthroughSubject<DataStore, Never>()
     
     @Published var login: Bool = false
+    @Published var session_token: String = ""
     
     @UserDefault(key: "loggedIn", defaultValue: false)
     var loggedIn: Bool {
         didSet {
             didChange.send(self)
             self.login = self.loggedIn
+        }
+    }
+    
+    @UserDefault(key: "token", defaultValue: "")
+    var token: String {
+        didSet {
+            didChange.send(self)
+            self.session_token = self.token
         }
     }
 }

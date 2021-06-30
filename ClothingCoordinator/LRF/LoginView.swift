@@ -15,6 +15,7 @@ struct LoginView: View {
     
     @State var email: String = ""
     @State var password: String = ""
+    @State var token: String = ""
     @State var alertMsg = ""
     
     @State private var showForgotPassword = false
@@ -111,10 +112,29 @@ struct LoginView: View {
                     Spacer()
                     Button(action: {
                         if  self.isValidInputs() {
-                            // For use with property wrapper
-                            UserDefaults.standard.set(true, forKey: "Loggedin")
-                            UserDefaults.standard.synchronize()
-                            self.settings.loggedIn = true
+                            apiCall().loginUser(completion: {
+                                (token, response) in
+                                print(response.statusCode)
+                                if (response.statusCode != 200)
+                                {
+                                    self.alertMsg = "Invalid email or password."
+                                    self.showAlert.toggle()
+                                }
+                                else
+                                {
+                                    // Saves valid login in memory on refresh
+                                    UserDefaults.standard.set(true, forKey: "Loggedin")
+                                    
+                                    UserDefaults.standard.set(token.token, forKey: "token")
+                                    
+                                    UserDefaults.standard.synchronize()
+                                    
+                                    // Actually changes the view
+                                    self.settings.loggedIn = true
+                                    self.settings.token = token.token
+                                }
+                            }, email: email, password: password)
+                            
                             // ==========
                             
                             // For use with property wrapper

@@ -22,18 +22,23 @@ struct User: Codable, Identifiable {
     let id = UUID()
     let name: String
     let email: String
-    let password: String
+}
+
+struct GuestList: Codable, Identifiable {
+    let id = UUID()
+    let party_ids: [Int]
 }
 
 struct Party: Codable, Identifiable {
     let id = UUID()
     let name: String
-    let host_id: Int
+    let host: String
     let description: String
     let date: String
 }
 
-struct Token: Codable, Identifiable {
+struct LoggedInfo: Codable, Identifiable {
     let id = UUID()
     let token: String
+    let userid: Int
 }

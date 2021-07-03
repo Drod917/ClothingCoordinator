@@ -15,6 +15,8 @@ final class DataStore: ObservableObject {
     
     @Published var login: Bool = false
     @Published var session_token: String = ""
+    @Published var name: String = ""
+    @Published var email_address: String = ""
     
     @UserDefault(key: "loggedIn", defaultValue: false)
     var loggedIn: Bool {
@@ -29,6 +31,22 @@ final class DataStore: ObservableObject {
         didSet {
             didChange.send(self)
             self.session_token = self.token
+        }
+    }
+    
+    @UserDefault(key: "username", defaultValue: "")
+    var username: String {
+        didSet {
+            didChange.send(self)
+            self.name = self.username
+        }
+    }
+    
+    @UserDefault(key: "email", defaultValue: "")
+    var email: String {
+        didSet {
+            didChange.send(self)
+            self.email_address = self.email
         }
     }
 }

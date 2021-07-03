@@ -13,7 +13,7 @@ struct LoginView: View {
     
     @EnvironmentObject var settings: UserSettings
     
-    @State var email: String = ""
+    @State var username: String = ""
     @State var password: String = ""
     @State var token: String = ""
     @State var alertMsg = ""
@@ -52,16 +52,15 @@ struct LoginView: View {
                     
                     HStack {
                         
-                        Image("ic_email")
+                        Image("ic_user")
                             .padding(.leading, (UIScreen.main.bounds.width * 20) / 414)
                         
-                        TextField("Email", text: $email)
+                        TextField("Username", text: $username)
                             .frame(height: (UIScreen.main.bounds.width * 40) / 414, alignment: .center)
                             .padding(.leading, (UIScreen.main.bounds.width * 10) / 414)
                             .padding(.trailing, (UIScreen.main.bounds.width * 10) / 414)
                             .font(.system(size: (UIScreen.main.bounds.width * 15) / 414, weight: .regular, design: .default))
                             .imageScale(.small)
-                            .keyboardType(.emailAddress)
                             .autocapitalization(UITextAutocapitalizationType.none)
                         
                     }
@@ -113,27 +112,41 @@ struct LoginView: View {
                     Button(action: {
                         if  self.isValidInputs() {
                             apiCall().loginUser(completion: {
-                                (token, response) in
+                                (loginInfo, response) in
                                 print(response.statusCode)
                                 if (response.statusCode != 200)
                                 {
-                                    self.alertMsg = "Invalid email or password."
+                                    self.alertMsg = "Invalid username or password."
                                     self.showAlert.toggle()
                                 }
                                 else
                                 {
+                                    apiCall().getUserInfo( completion: {
+                                        (user) in
+                                        
+                                        UserDefaults.standard.set(user.name, forKey: "username")
+                                        
+                                        UserDefaults.standard.set(user.email, forKey: "email")
+                                        
+                                        self.settings.username = user.name
+                                        
+                                        self.settings.email = user.email
+                                        
+                                    }, id: Int(loginInfo.userid), token: loginInfo.token)
+                                    
                                     // Saves valid login in memory on refresh
                                     UserDefaults.standard.set(true, forKey: "Loggedin")
                                     
-                                    UserDefaults.standard.set(token.token, forKey: "token")
+                                    UserDefaults.standard.set(loginInfo.token, forKey: "token")
                                     
                                     UserDefaults.standard.synchronize()
                                     
                                     // Actually changes the view
                                     self.settings.loggedIn = true
-                                    self.settings.token = token.token
+                                    self.settings.token = loginInfo.token
+
                                 }
-                            }, email: email, password: password)
+                            }, username: username, password: password)
                             
                             // ==========
                             
@@ -172,12 +185,8 @@ struct LoginView: View {
     
     fileprivate func isValidInputs() -> Bool {
         
-        if self.email == "" {
+        if self.username == "" {
             self.alertMsg = "Email can't be blank."
-            self.showAlert.toggle()
-            return false
-        } else if !self.email.isValidEmail {
-            self.alertMsg = "Email is not valid."
             self.showAlert.toggle()
             return false
         } else if self.password == "" {

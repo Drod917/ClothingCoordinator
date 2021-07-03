@@ -23,10 +23,10 @@ struct GuestView: View {
                     Button(action: {
                         showEditing = true
                     }) {
-                        PartyCardView(partyName: "\(party.name)", hostName: String(party.host_id), description: "\(party.description)", date: party.date)
+                        PartyCardView(partyName: "\(party.name)", hostName: String(party.host), description: "\(party.description)", date: party.date)
                     }
                     .sheet(isPresented: $showEditing) {
-                        PartyFullView(partyName: "\(party.name)", hostName: String(party.host_id), description: "\(party.description).", date: party.date)
+                        PartyFullView(partyName: "\(party.name)", hostName: String(party.host), description: "\(party.description).", date: party.date)
                     }
                     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 }
@@ -40,7 +40,7 @@ struct GuestView: View {
                 token = UserDefaults.standard.string(forKey: "token") ?? "No token found"
                 //token = settings.token
                 
-                apiCall().getParties(completion:  {     (parties) in
+                apiCall().getInvitedParties(completion:  {     (parties) in
                         self.parties = parties
                     },
                 token: token)

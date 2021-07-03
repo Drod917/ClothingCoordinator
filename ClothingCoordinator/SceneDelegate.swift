@@ -13,6 +13,8 @@ class UserSettings: ObservableObject {
     
     @Published var loggedIn : Bool = false
     @Published var token : String = ""
+    @Published var username: String = ""
+    @Published var email: String = ""
 }
 
 class UserOnboard: ObservableObject {

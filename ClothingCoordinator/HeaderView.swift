@@ -8,17 +8,27 @@
 import SwiftUI
 
 struct HeaderView : View {
+    @EnvironmentObject var settings: UserSettings
+    @State var username: String = ""
+    @State var email: String = ""
+    
     var body: some View {
         HStack {
             Image("logo")
                 .resizable()
                 .frame(width: 50, height: 50, alignment: .trailing)
             VStack(alignment: .leading) {
-                Text("Daniel Rodriguez")
+                Text(self.settings.username)
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                Text("daniel@rodriguez.com")
+                Text(self.settings.email)
             }
             .frame(width: 175, height: 50)
+            .onAppear {
+                username = UserDefaults.standard.string(forKey: "username") ?? "No user found"
+                email = UserDefaults.standard.string(forKey: "email") ?? "No email found"
+                self.settings.username = username
+                self.settings.email = email
+            }
         }
     }
 }

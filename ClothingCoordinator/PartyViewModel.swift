@@ -16,12 +16,14 @@ import SwiftUI
 //            var new_card = PartyFullView(partyName: party.name, hostName: party.host, description: party.description, date: party.date)
 //            fullCardViews.append(new_card)
 //        }
-//    }
+//    }s
 //}
 
 class apiCall {
+    let apiIP = "http://192.168.1.165:5000"
+    
     func getHostedParties(completion:@escaping ([Party]) -> (), token: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/party/host") else { return }
+        guard let url = URL(string: apiIP + "/party/host") else { return }
         var partyRequest = URLRequest(url: url)
         partyRequest.addValue(token, forHTTPHeaderField: "x-access-tokens")
         
@@ -36,7 +38,7 @@ class apiCall {
     }
     
     func getInvitedParties(completion:@escaping ([Party]) -> (), token: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/party/guest") else { return }
+        guard let url = URL(string: apiIP + "/party/guest") else { return }
         var partyRequest = URLRequest(url: url)
         partyRequest.addValue(token, forHTTPHeaderField: "x-access-tokens")
         
@@ -53,7 +55,7 @@ class apiCall {
     }
     
     func createParty(completion:@escaping (HTTPURLResponse) -> Void, name: String, desc: String, date: String, publicity: Bool, token: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/party/create") else { return }
+        guard let url = URL(string: apiIP + "/party/create") else { return }
         var joinPartyRequest = URLRequest(url: url)
         var publicity_lvl: String
         var query: Dictionary? = [:]
@@ -83,7 +85,7 @@ class apiCall {
     }
     
     func joinParty(completion:@escaping (HTTPURLResponse) -> Void, code: String, token: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/party/guest/join") else { return }
+        guard let url = URL(string: apiIP + "/party/guest/join") else { return }
         var joinPartyRequest = URLRequest(url: url)
         let query = ["invite_code" : code]
         joinPartyRequest.httpMethod = "POST"
@@ -101,7 +103,7 @@ class apiCall {
     }
     
     func deleteParty(completion:@escaping (HTTPURLResponse) -> Void, name: String, token: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/party/delete") else { return }
+        guard let url = URL(string: apiIP + "/party/delete") else { return }
         var deletePartyRequest = URLRequest(url: url)
         let query = ["name" : name]
         deletePartyRequest.httpMethod = "DELETE"
@@ -119,7 +121,7 @@ class apiCall {
     }
     
     func leaveParty(completion:@escaping (HTTPURLResponse) -> Void, name: String, token: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/party/guest/leave") else { return }
+        guard let url = URL(string: apiIP + "/party/guest/leave") else { return }
         var leavePartyRequest = URLRequest(url: url)
         let query = ["party_name" : name]
         leavePartyRequest.httpMethod = "POST"
@@ -137,7 +139,7 @@ class apiCall {
     }
     
     func getUserInfo(completion: @escaping (User) -> (), id: Int, token: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/user/" + String(id)) else { return }
+        guard let url = URL(string: apiIP + "/user/" + String(id)) else { return }
         var userInfoRequest = URLRequest(url: url)
         userInfoRequest.httpMethod = "GET"
         userInfoRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -154,8 +156,9 @@ class apiCall {
     }
     
     func registerUser(completion: @escaping (HTTPURLResponse) -> Void, name: String, email: String, password: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/register") else { return }
-        let query = ["name": name, "email": email, "password": password]
+        guard let url = URL(string: apiIP + "/register") else { return }
+        let query = ["username": name, "email": email, "password": password]
+        print("Register query:\n username: \(name)\n email: \(email)\n pw: \(password)")
         var registerRequest = URLRequest(url: url)
         registerRequest.httpMethod = "POST"
         registerRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -172,7 +175,7 @@ class apiCall {
     }
     
     func loginUser(completion: @escaping (LoggedInfo, HTTPURLResponse) -> (), username: String, password: String) {
-        guard let url = URL(string: "http://192.168.1.170:5000/login") else { return }
+        guard let url = URL(string: apiIP + "/login") else { return }
         //let query = ["email": email, "password": password]
         var registerRequest = URLRequest(url: url)
         registerRequest.httpMethod = "POST"

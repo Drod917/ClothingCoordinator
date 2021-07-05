@@ -163,6 +163,10 @@ struct SignUpView: View {
                                     self.alertMsg = "Email address is already associated with an existing account."
                                     self.showAlert.toggle()
                                 }
+                                else if (response.statusCode == 404) {
+                                    self.alertMsg = "Username, password, or email missing."
+                                    self.showAlert.toggle()
+                                }
                                 else
                                 {
                                     self.presentationMode.wrappedValue.dismiss()

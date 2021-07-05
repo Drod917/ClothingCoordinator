@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PartyFullView: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.colorScheme) var colorScheme
     let randomNum = Int.random(in: 0...2)
     let images = [
@@ -20,6 +21,8 @@ struct PartyFullView: View {
     @State var hostName: String
     @State var description: String
     @State var date: String
+    @State var inviteCode: String
+    @State var host: Bool
     
     var body: some View {
         VStack {
@@ -34,9 +37,11 @@ struct PartyFullView: View {
                     Text("\(partyName)")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .multilineTextAlignment(.center)
-                        .padding(.leading)
                     Spacer()
+                    Text(inviteCode)
                 }
+                .padding(.leading)
+                .padding(.trailing, 20)
                 HStack {
                     Text("\(date)")
                         .font(.system(size: 10,
@@ -62,8 +67,32 @@ struct PartyFullView: View {
                 }
                 .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 .alert(isPresented: $showDelete, content: {
-                    Alert(title: Text("Are you sure you want to leave \(partyName)?"), message: Text(""), primaryButton: .cancel(Text("Stay")), secondaryButton:.destructive(Text("Leave")))
-                })
+                    let confirm = Alert.Button.destructive(Text("Confirm")) {
+                        let token = UserDefaults.standard.string(forKey: "token") ?? "No token found"
+                        
+                        if (host == true) {
+                            apiCall().deleteParty(completion: {
+                                response in
+                                if (response.statusCode == 200) {
+                                    self.presentationMode.wrappedValue.dismiss()
+                                }
+                            }, name: partyName, token: token)
+                        }
+                        else {
+                            apiCall().leaveParty(completion: {
+                                response in
+                                if (response.statusCode == 200) {
+                                    self.presentationMode.wrappedValue.dismiss()
+                                }
+                            }, name: partyName, token: token)
+                        }
+                        
+                    }
+                    let cancel = Alert.Button.default(Text("Cancel")) {/*do nothing*/}
+                    
+                    return Alert(title: Text(host == true ? "Are you sure you want to delete \(partyName)?": "Are you sure you want to leave \(partyName)?"), message: Text(""), primaryButton: confirm, secondaryButton: cancel)
+                    })
+
             }
             .padding(.leading)
             .padding(.trailing)
@@ -75,7 +104,7 @@ struct PartyFullView: View {
 
 struct PartyFullView_Previews: PreviewProvider {
     static var previews: some View {
-        PartyFullView(partyName: "Daniel's Birthday", hostName: "Daniel", description: "Here is where the description goes.", date: "01/01/1970")
+        PartyFullView(partyName: "Daniel's Birthday", hostName: "Daniel", description: "Here is where the description goes.", date: "01/01/1970", inviteCode: "xxxXXX", host: true)
             .preferredColorScheme(.light)
     }
 }

@@ -19,7 +19,7 @@ struct PartyCardView: View {
     @State var partyName : String
     @State var hostName: String
     @State var description: String
-    @State var date: String 
+    @State var date: String
     
     var body: some View {
         ZStack {
@@ -64,16 +64,6 @@ struct PartyCardView: View {
                         .frame(width: 200, alignment: .leading)
                     Spacer()
                         .frame(width: 120)
-                    Button(action: {
-                        self.showDelete = true
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                    }
-                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-                    .alert(isPresented: $showDelete, content: {
-                        Alert(title: Text("Are you sure you want to leave \(partyName)?"), message: Text(""), primaryButton: .cancel(Text("Stay")), secondaryButton:.destructive(Text("Leave")))
-                    })
-                    
                 }
             }
             .padding()

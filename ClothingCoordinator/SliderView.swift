@@ -46,9 +46,7 @@ struct SliderView : View, SliderProtocol {
                         UserDefaults.standard.set(false, forKey: "Loggedin")
                         UserDefaults.standard.synchronize()
                         self.settings.loggedIn = false
-                    
-                        self.drawerControl.show(type: .leftRear, isShow: false)
-                        self.drawerControl.setMain(view: LoginView())
+
                         
                         // ==========
                         

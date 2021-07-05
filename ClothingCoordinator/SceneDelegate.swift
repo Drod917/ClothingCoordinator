@@ -154,9 +154,7 @@ struct StartOnboardView: View {
             if UserDefaults.standard.bool(forKey: "Loggedin") {
                 settings.loggedIn = true
 //                return AnyView(TabbarVC())
-                return AnyView(Drawer()
-                                .setSlider(view: SliderView(type: .leftRear))
-                                .setMain(view: GuestView()).environmentObject(settings))
+                return AnyView(contentView.environmentObject(settings))
             } else {
                 settings.loggedIn = false
                 return AnyView(OnboardingView())

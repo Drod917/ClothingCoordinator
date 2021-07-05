@@ -9,7 +9,15 @@
 import Foundation
 import SwiftUI
 
-// TODO ASAP: GET CHECKS ON EVERY SINGLE DECODER CALL
+//class guestController {
+//    func getCards(completion:@escaping (([PartyFullView]) -> ()), parties: [Party]) {
+//        var fullCardViews: [PartyFullView]
+//        ForEach (parties) { party in
+//            var new_card = PartyFullView(partyName: party.name, hostName: party.host, description: party.description, date: party.date)
+//            fullCardViews.append(new_card)
+//        }
+//    }
+//}
 
 class apiCall {
     func getHostedParties(completion:@escaping ([Party]) -> (), token: String) {
@@ -44,9 +52,92 @@ class apiCall {
         .resume()
     }
     
+    func createParty(completion:@escaping (HTTPURLResponse) -> Void, name: String, desc: String, date: String, publicity: Bool, token: String) {
+        guard let url = URL(string: "http://192.168.1.170:5000/party/create") else { return }
+        var joinPartyRequest = URLRequest(url: url)
+        var publicity_lvl: String
+        var query: Dictionary? = [:]
+        
+        if (publicity == true) {
+            publicity_lvl = "open_with_blacklist"
+            query = ["name" : name, "description" : desc, "date" : date, "publicity" : publicity_lvl, "blacklist" : [""]]
+
+        }
+        else {
+            publicity_lvl = "whitelist_only"
+            query = ["name" : name, "description" : desc, "date" : date, "publicity" : publicity_lvl, "whitelist": [""]]
+        }
+        
+        joinPartyRequest.httpMethod = "POST"
+        joinPartyRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        joinPartyRequest.addValue(token, forHTTPHeaderField: "x-access-tokens")
+        joinPartyRequest.httpBody = try! JSONSerialization.data(withJSONObject: query, options: [])
+
+        URLSession.shared.dataTask(with: joinPartyRequest) { (data, response, error) in
+            
+            DispatchQueue.main.async {
+                completion(response as! HTTPURLResponse)
+            }
+        }
+        .resume()
+    }
+    
+    func joinParty(completion:@escaping (HTTPURLResponse) -> Void, code: String, token: String) {
+        guard let url = URL(string: "http://192.168.1.170:5000/party/guest/join") else { return }
+        var joinPartyRequest = URLRequest(url: url)
+        let query = ["invite_code" : code]
+        joinPartyRequest.httpMethod = "POST"
+        joinPartyRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        joinPartyRequest.addValue(token, forHTTPHeaderField: "x-access-tokens")
+        joinPartyRequest.httpBody = try! JSONSerialization.data(withJSONObject: query, options: [])
+
+        URLSession.shared.dataTask(with: joinPartyRequest) { (data, response, error) in
+            
+            DispatchQueue.main.async {
+                completion(response as! HTTPURLResponse)
+            }
+        }
+        .resume()
+    }
+    
+    func deleteParty(completion:@escaping (HTTPURLResponse) -> Void, name: String, token: String) {
+        guard let url = URL(string: "http://192.168.1.170:5000/party/delete") else { return }
+        var deletePartyRequest = URLRequest(url: url)
+        let query = ["name" : name]
+        deletePartyRequest.httpMethod = "DELETE"
+        deletePartyRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        deletePartyRequest.addValue(token, forHTTPHeaderField: "x-access-tokens")
+        deletePartyRequest.httpBody = try! JSONSerialization.data(withJSONObject: query, options: [])
+
+        URLSession.shared.dataTask(with: deletePartyRequest) { (data, response, error) in
+            
+            DispatchQueue.main.async {
+                completion(response as! HTTPURLResponse)
+            }
+        }
+        .resume()
+    }
+    
+    func leaveParty(completion:@escaping (HTTPURLResponse) -> Void, name: String, token: String) {
+        guard let url = URL(string: "http://192.168.1.170:5000/party/guest/leave") else { return }
+        var leavePartyRequest = URLRequest(url: url)
+        let query = ["party_name" : name]
+        leavePartyRequest.httpMethod = "POST"
+        leavePartyRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        leavePartyRequest.addValue(token, forHTTPHeaderField: "x-access-tokens")
+        leavePartyRequest.httpBody = try! JSONSerialization.data(withJSONObject: query, options: [])
+
+        URLSession.shared.dataTask(with: leavePartyRequest) { (data, response, error) in
+            
+            DispatchQueue.main.async {
+                completion(response as! HTTPURLResponse)
+            }
+        }
+        .resume()
+    }
+    
     func getUserInfo(completion: @escaping (User) -> (), id: Int, token: String) {
         guard let url = URL(string: "http://192.168.1.170:5000/user/" + String(id)) else { return }
-        print("\n\nTrying url \(url)")
         var userInfoRequest = URLRequest(url: url)
         userInfoRequest.httpMethod = "GET"
         userInfoRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")

@@ -1,5 +1,5 @@
 //
-//  GuestView.swift
+//  HostView.swift
 //  Clothing Coordinator
 //
 //  Created by Daniel Rodriguez on 6/21/21.
@@ -12,38 +12,56 @@ struct GuestView: View {
     @EnvironmentObject var settings: UserSettings
     @Environment(\.colorScheme) var colorScheme
     @State var parties: [Party] = []
-    @State private var showEditing = false
+    @State var selectedParty: Party!
     @State var token: String = ""
+    @State var showJoinParty: Bool = false
         
     var body: some View {
         
         NavigationView {
             ScrollView {
-                ForEach(parties, id: \.id) { party in
+                ForEach(parties) { party in
                     Button(action: {
-                        showEditing = true
+                        selectedParty = party
                     }) {
-                        PartyCardView(partyName: "\(party.name)", hostName: String(party.host), description: "\(party.description)", date: party.date)
+                        PartyCardView(partyName: "\(party.name)", hostName: party.host, description: "\(party.description)", date: party.date)
                     }
-                    .sheet(isPresented: $showEditing) {
-                        PartyFullView(partyName: "\(party.name)", hostName: String(party.host), description: "\(party.description).", date: party.date)
+                    .sheet(item: $selectedParty, onDismiss: {
+                        apiCall().getInvitedParties(completion:  {     (parties) in
+                                    self.parties = parties
+                                },
+                                token: token)
+                        }) { party in
+                        PartyFullView(partyName: "\(party.name)", hostName: party.host, description: "\(party.description)", date: party.date, inviteCode: party.inviteCode, host: false)
                     }
                     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 }
                 HStack {
-                    Image(systemName: "plus.circle")
-                        .padding(.top, 20)
+                    Button(action: {
+                        showJoinParty = true
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .padding(.top, 20)
+                    }
+                    .sheet(isPresented: $showJoinParty, onDismiss: {
+                        apiCall().getInvitedParties(completion:  {     (parties) in
+                                    self.parties = parties
+                                },
+                                token: token)
+                        }) {
+                        JoinPartyView()
+                    }
+                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 }
             }
             .navigationBarTitle("Guest List")
             .onAppear {
                 token = UserDefaults.standard.string(forKey: "token") ?? "No token found"
-                //token = settings.token
                 
                 apiCall().getInvitedParties(completion:  {     (parties) in
-                        self.parties = parties
-                    },
-                token: token)
+                            self.parties = parties
+                        },
+                        token: token)
             }
         }
     }
@@ -52,6 +70,5 @@ struct GuestView: View {
 struct GuestView_Previews: PreviewProvider {
     static var previews: some View {
         GuestView()
-            
     }
 }

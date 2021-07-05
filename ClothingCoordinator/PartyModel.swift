@@ -35,6 +35,7 @@ struct Party: Codable, Identifiable {
     let host: String
     let description: String
     let date: String
+    let inviteCode: String
 }
 
 struct LoggedInfo: Codable, Identifiable {

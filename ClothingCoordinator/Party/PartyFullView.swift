@@ -24,6 +24,9 @@ struct PartyFullView: View {
     @State var inviteCode: String
     @State var host: Bool
     
+    @State var guestlist: [String] = []
+    @State var token: String = ""
+    
     var body: some View {
         VStack {
             Image("\(images[randomNum])")
@@ -96,7 +99,22 @@ struct PartyFullView: View {
             }
             .padding(.leading)
             .padding(.trailing)
-            Spacer()
+            .padding(.bottom, 40)
+            
+            Text("Guestlist")
+                .padding(.trailing, (UIScreen.main.bounds.width * 235) / 414)
+            List {
+                ForEach(0..<guestlist.count, id:\.self) {
+                    i in
+                    Text(guestlist[i])
+                }
+            }
+            .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, minHeight: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxHeight: 300, alignment: .center)
+            .overlay(
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke(Color.black, lineWidth: 1)
+            )
+            .padding(EdgeInsets(top: 0, leading: 50, bottom: 10, trailing: 50))
         }
         .padding(.top)
     }
@@ -104,7 +122,7 @@ struct PartyFullView: View {
 
 struct PartyFullView_Previews: PreviewProvider {
     static var previews: some View {
-        PartyFullView(partyName: "Daniel's Birthday", hostName: "Daniel", description: "Here is where the description goes.", date: "01/01/1970", inviteCode: "xxxXXX", host: true)
+        PartyFullView(partyName: "Daniel's Birthday", hostName: "Daniel", description: "Here is where the description goes.", date: "01/01/1970", inviteCode: "xxxXXX", host: true, guestlist: ["test","test2"])
             .preferredColorScheme(.light)
     }
 }

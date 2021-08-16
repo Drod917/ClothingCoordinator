@@ -32,7 +32,7 @@ struct GuestView: View {
                                 },
                                 token: token)
                         }) { party in
-                        PartyFullView(partyName: "\(party.name)", hostName: party.host, description: "\(party.description)", date: party.date, inviteCode: party.inviteCode, host: false)
+                        PartyFullView(partyName: "\(party.name)", hostName: party.host, description: "\(party.description)", date: party.date, inviteCode: party.inviteCode, host: false, guestlist: party.guestlist)
                     }
                     .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                 }

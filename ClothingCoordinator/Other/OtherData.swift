@@ -35,13 +35,13 @@ extension String {
     }
     
     var isAlphanumeric: Bool {
-        if self.count < 8 {
-            return true
-        }
-        return !isBlank && rangeOfCharacter(from: .alphanumerics) != nil
-//        let regex = "^[a-zA-Z0-9]$"
-//        let predicate = NSPredicate(format:"SELF MATCHES %@", regex)
-//        return predicate.evaluate(with:self)
+//        if self.count < 8 {
+//            return true
+//        }
+//        return !isBlank && rangeOfCharacter(from: .alphanumerics) != nil
+        let regex = "^[a-zA-Z0-9]+$"
+        let predicate = NSPredicate(format:"SELF MATCHES %@", regex)
+        return predicate.evaluate(with:self)
     }
     
     var isValidEmail: Bool {

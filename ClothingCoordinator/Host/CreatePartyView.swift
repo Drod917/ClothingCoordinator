@@ -17,10 +17,12 @@ struct CreatePartyView: View {
     
     
     @State var token: String = ""
+    
     @State var alertMsg = ""
     @State var alertTitle = ""
     @State var showAlert: Bool = false
-    @State var publicity: Bool = true
+    @State var isPublic: Bool = true
+    @State var userlist: [String] = []
     
     var alert: Alert {
         Alert(title: Text(alertTitle), message: Text(alertMsg), dismissButton: .default(Text("OK")))
@@ -38,7 +40,7 @@ struct CreatePartyView: View {
                 .autocapitalization(UITextAutocapitalizationType.none)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.black, lineWidth: 2)
+                        .stroke(Color.black, lineWidth: 1)
                 )
                 .padding(EdgeInsets(top: 0, leading: 40, bottom: 5, trailing: 40))
             TextField("Description", text: $partyDesc)
@@ -50,7 +52,7 @@ struct CreatePartyView: View {
                 .autocapitalization(UITextAutocapitalizationType.none)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.black, lineWidth: 2)
+                        .stroke(Color.black, lineWidth: 1)
                 )
                 .padding(EdgeInsets(top: 0, leading: 40, bottom: 5, trailing: 40))
             TextField("Date", text: $partyDate)
@@ -62,13 +64,37 @@ struct CreatePartyView: View {
                 .autocapitalization(UITextAutocapitalizationType.none)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.black, lineWidth: 2)
+                        .stroke(Color.black, lineWidth: 1)
                 )
                 .padding(EdgeInsets(top: 0, leading: 40, bottom: 20, trailing: 40))
-            Toggle("Public", isOn: $publicity)
+            Toggle("Public", isOn: $isPublic)
                 .padding(.leading, (UIScreen.main.bounds.width * 250) / 414)
                 .padding(.trailing, (UIScreen.main.bounds.width * 50) / 414)
                 .padding(.bottom, 20)
+            
+            Text(isPublic ? "Blacklist" : "Whitelist")
+                .padding(.trailing, (UIScreen.main.bounds.width * 235) / 414)
+            
+            List {
+                ForEach(0..<userlist.count, id:\.self) {
+                    i in
+                    TextField("Enter user", text: $userlist[i])
+                }
+            }
+            .frame(minWidth: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, minHeight: /*@START_MENU_TOKEN@*/0/*@END_MENU_TOKEN@*/, maxHeight: 150, alignment: .center)
+            .overlay(
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke(Color.black, lineWidth: 1)
+            )
+            .padding(EdgeInsets(top: 0, leading: 50, bottom: 10, trailing: 50))
+            
+            Button(action: {
+                userlist.append("")
+            }) {
+                Image(systemName: "plus.circle")
+            }
+            .padding(.leading, 300)
+
             
             Button(action: {
                 apiCall().createParty(completion: {
@@ -87,7 +113,7 @@ struct CreatePartyView: View {
                         print(response.statusCode)
                         print("sending token: \(token)")
                     }
-                }, name: partyName, desc: partyDesc, date: partyDate, publicity: publicity, token: token)
+                }, name: partyName, desc: partyDesc, date: partyDate, publicity: isPublic, userlist: userlist, token: token)
             }) {
                 buttonWithBackground(btnText: "Create")
             }

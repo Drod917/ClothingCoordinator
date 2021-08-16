@@ -59,7 +59,7 @@ struct SignUpView: View {
                         Image("ic_user")
                             .padding(.leading, 20)
                         
-                        TextField("Name", text: $name)
+                        TextField("Username", text: $name)
                             .frame(height: 40, alignment: .center)
                             .padding(.leading, 10)
                             .padding(.trailing, 10)
@@ -167,6 +167,10 @@ struct SignUpView: View {
                                     self.alertMsg = "Username, password, or email missing."
                                     self.showAlert.toggle()
                                 }
+                                else if (response.statusCode == 408) {
+                                    self.alertMsg = "Server cannot be reached."
+                                    self.showAlert.toggle()
+                                }
                                 else
                                 {
                                     self.presentationMode.wrappedValue.dismiss()
@@ -175,7 +179,7 @@ struct SignUpView: View {
                         }
                     }) {
 
-                        buttonWithBackground(btnText: "SignUp")
+                        buttonWithBackground(btnText: "Sign Up")
                     }
                     .padding(.bottom, (UIScreen.main.bounds.width * 30) / 414)
                     .alert(isPresented: $showAlert, content: { self.alert })
@@ -192,7 +196,11 @@ struct SignUpView: View {
     fileprivate func isValidInputs() -> Bool {
         
         if self.name == "" {
-            self.alertMsg = "First name can't be blank."
+            self.alertMsg = "Username can't be blank."
+            self.showAlert.toggle()
+            return false
+        } else if !self.name.isAlphanumeric {
+            self.alertMsg = "Username must be alphanumeric."
             self.showAlert.toggle()
             return false
         } else if self.email == "" {

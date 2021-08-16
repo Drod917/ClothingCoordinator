@@ -20,7 +20,7 @@ import SwiftUI
 //}
 
 class apiCall {
-    let apiIP = "http://192.168.1.165:5000"
+    let apiIP = "http://192.168.1.170:5000"
     
     func getHostedParties(completion:@escaping ([Party]) -> (), token: String) {
         guard let url = URL(string: apiIP + "/party/host") else { return }
@@ -29,6 +29,10 @@ class apiCall {
         
         URLSession.shared.dataTask(with: partyRequest) { (data, _, _) in
             let parties = try? JSONDecoder().decode([Party].self, from: data!)
+            if (parties == nil) {
+                print("No invited parties found!")
+            }
+            
             // fails and returns json if user has no token
             DispatchQueue.main.async {
                 completion(parties ?? [])
@@ -42,11 +46,15 @@ class apiCall {
         var partyRequest = URLRequest(url: url)
         partyRequest.addValue(token, forHTTPHeaderField: "x-access-tokens")
         
-        URLSession.shared.dataTask(with: partyRequest) { (data, _, _) in
+        URLSession.shared.dataTask(with: partyRequest) { (data, response, _) in
             // catch Swift.DecodingError: user not logged in so API returns {"message":"not logged in"}
             let parties = try? JSONDecoder().decode([Party].self, from: data!)
             //let parties = try! JSONSerialization.jsonObject(with: data!, options: [])
+            if (parties == nil) {
+                print("No invited parties found!")
+            }
             
+            // fails and returns a json message if user has no token
             DispatchQueue.main.async {
                 completion(parties ?? [])
             }
@@ -54,7 +62,7 @@ class apiCall {
         .resume()
     }
     
-    func createParty(completion:@escaping (HTTPURLResponse) -> Void, name: String, desc: String, date: String, publicity: Bool, token: String) {
+    func createParty(completion:@escaping (HTTPURLResponse) -> Void, name: String, desc: String, date: String, publicity: Bool, userlist: [String], token: String) {
         guard let url = URL(string: apiIP + "/party/create") else { return }
         var joinPartyRequest = URLRequest(url: url)
         var publicity_lvl: String
@@ -62,12 +70,12 @@ class apiCall {
         
         if (publicity == true) {
             publicity_lvl = "open_with_blacklist"
-            query = ["name" : name, "description" : desc, "date" : date, "publicity" : publicity_lvl, "blacklist" : [""]]
+            query = ["name" : name, "description" : desc, "date" : date, "publicity" : publicity_lvl, "blacklist" : userlist]
 
         }
         else {
             publicity_lvl = "whitelist_only"
-            query = ["name" : name, "description" : desc, "date" : date, "publicity" : publicity_lvl, "whitelist": [""]]
+            query = ["name" : name, "description" : desc, "date" : date, "publicity" : publicity_lvl, "whitelist": userlist]
         }
         
         joinPartyRequest.httpMethod = "POST"
@@ -164,11 +172,25 @@ class apiCall {
         registerRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         registerRequest.httpBody = try! JSONSerialization.data(withJSONObject: query, options: [])
         
-        URLSession.shared.dataTask(with: registerRequest) { (data, response, error) in
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.timeoutIntervalForRequest = 5
+        sessionConfig.timeoutIntervalForResource = 10
+        let session = URLSession(configuration: sessionConfig)
+        
+        //URLSession.shared.dataTask(
+        session.dataTask(with: registerRequest) { (data, response, error) in
             //let users = try! JSONDecoder().decode([User].self, from: data!)
+            if (response != nil) {
+                DispatchQueue.main.async {
+                    completion(response as! HTTPURLResponse)
+                }
+            }
             
-            DispatchQueue.main.async {
-                completion(response as! HTTPURLResponse)
+            if (error as? URLError)?.code == .timedOut {
+                // Timed out
+                DispatchQueue.main.async {
+                    completion(HTTPURLResponse(url: URL(string: "...")!, statusCode: 408, httpVersion: nil, headerFields: nil)!)
+                }
             }
         }
         .resume()
@@ -177,17 +199,17 @@ class apiCall {
     func loginUser(completion: @escaping (LoggedInfo, HTTPURLResponse) -> (), username: String, password: String) {
         guard let url = URL(string: apiIP + "/login") else { return }
         //let query = ["email": email, "password": password]
-        var registerRequest = URLRequest(url: url)
-        registerRequest.httpMethod = "POST"
-        registerRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        var loginRequest = URLRequest(url: url)
+        loginRequest.httpMethod = "POST"
+        loginRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let str = "\(username):\(password)"
         let utf8str = str.data(using: .utf8)
         let base64Encoded = utf8str?.base64EncodedString(options: Data.Base64EncodingOptions(rawValue: 0))
-        registerRequest.setValue("Basic " + base64Encoded!, forHTTPHeaderField: "Authorization")
+        loginRequest.setValue("Basic " + base64Encoded!, forHTTPHeaderField: "Authorization")
         //registerRequest.httpBody = try! JSONSerialization.data(withJSONObject: query, options: [])
         
-        URLSession.shared.dataTask(with: registerRequest) { (data, response, error) in
+        URLSession.shared.dataTask(with: loginRequest) { (data, response, error) in
             let loginInfo = try! JSONDecoder().decode(LoggedInfo.self, from: data!)
             print(loginInfo)
             
